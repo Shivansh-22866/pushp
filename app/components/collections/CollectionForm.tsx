@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Textarea } from '@/components/ui/textarea';
-import ImageUpload from '@/components/custom_ui/ImageUpload';
+import ImageUpload from '@/app/components/custom_ui/ImageUpload';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 
