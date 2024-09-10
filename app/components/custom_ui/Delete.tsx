@@ -18,20 +18,22 @@ import toast from 'react-hot-toast'
 
 interface DeleteProps {
   id: string;
+  item: string;
 }
 
 
-const Delete: React.FC<DeleteProps> = ({ id }) => {
+const Delete: React.FC<DeleteProps> = ({ id, item }) => {
   const [loading, setLoading] = useState(false)
   const onDelete = async () => {
     try {
       setLoading(true)
-      const res = await fetch(`/api/collections/${id}`, {
+      const itemType = item === "product" ? "product" : "collections"
+      const res = await fetch(`/api/${itemType}/${id}`, {
         method: "DELETE"
       })
       if(res.ok) {
         setLoading(false)
-        toast.success("Collection deleted successfully")
+        toast.success(`${item} deleted successfully`)
         window.location.reload()
       }
     }
@@ -51,7 +53,7 @@ const Delete: React.FC<DeleteProps> = ({ id }) => {
       <AlertDialogHeader>
         <AlertDialogTitle className='text-red-1'>Are you absolutely sure?</AlertDialogTitle>
         <AlertDialogDescription>
-          This action cannot be undone. This will permanently delete your collection from our servers.
+          This action cannot be undone. This will permanently delete your {item} from our servers.
         </AlertDialogDescription>
       </AlertDialogHeader>
       <AlertDialogFooter>

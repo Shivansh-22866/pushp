@@ -1,19 +1,13 @@
 "use client";
 
-import {
-  Command,
-  CommandDialog,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-  CommandSeparator,
-  CommandShortcut,
-} from "@/components/ui/command";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Badge } from "@/components/ui/badge";
 import { X } from "lucide-react";
+
+interface CollectionType {
+  _id: string;
+  title: string;
+}
 
 interface MultiSelectProps {
   placeholder: string;
@@ -25,64 +19,114 @@ interface MultiSelectProps {
 
 const MultiSelect: React.FC<MultiSelectProps> = ({
   placeholder,
-  collections = [], // Default to an empty array if not provided
-  value = [], // Default to an empty array if not provided
+  collections = [],
+  value = [],
   onChange,
   onRemove,
 }) => {
   const [inputValue, setInputValue] = useState("");
-  const [open, setOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  // Ensure that selected is always an array of CollectionType
-  const selected = value
-    .map((id) => collections.find((collection) => collection._id === id))
-    .filter((collection): collection is CollectionType => collection !== undefined);
+  // Handle clicks outside to close the dropdown
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
-  const selectables = collections.filter(
-    (collection) => !selected.includes(collection)
+  // Filter collections based on inputValue
+  const filteredCollections = collections.filter(
+    (collection) =>
+      collection.title.toLowerCase().includes(inputValue.toLowerCase()) &&
+      !value.includes(collection._id)
   );
 
-  return (
-    <Command className="overflow-visible bg-white">
-      <div className="flex gap-1 flex-wrap border rounded-md">
-        {selected.map((collection) => (
-          <Badge key={collection._id}>
-            {collection.title}
-            <button type="button" className="ml-1 hover:text-red-1" onClick={() => onRemove(collection._id)}>
-              <X className="h-3 w-3" />
-            </button>
-          </Badge>
-        ))}
+  // Handle selection of an item
+  const handleSelect = (id: string) => {
+    onChange(id);
+    setInputValue("");
+    setIsOpen(false);
+  };
 
-        <CommandInput
+  // Open dropdown on input focus
+  const handleFocus = () => {
+    setIsOpen(true);
+  };
+
+  // Open dropdown on input click
+  const handleClick = () => {
+    setIsOpen((prev) => !prev);
+  };
+
+  // Handle input value change
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInputValue(e.target.value);
+    setIsOpen(true); // Ensure dropdown remains open when typing
+  };
+
+  // Handle blur event to keep dropdown open if clicking inside it
+  const handleBlur = () => {
+    setTimeout(() => {
+      if (!inputRef.current?.contains(document.activeElement)) {
+        setIsOpen(false);
+      }
+    }, 100);
+  };
+
+  return (
+    <div className="relative" ref={containerRef}>
+      <div className="flex flex-wrap items-center border border-gray-300 rounded-lg bg-white shadow-sm">
+        {value.map((id) => {
+          const collection = collections.find((col) => col._id === id);
+          return collection ? (
+            <Badge key={id} className="flex items-center mb-1 mr-1 bg-gray-200 text-gray-800 m-2">
+              {collection.title}
+              <button
+                type="button"
+                className="ml-1 text-red-600 hover:text-red-800"
+                onClick={() => onRemove(id)}
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </Badge>
+          ) : null;
+        })}
+        <input
+          type="text"
           placeholder={placeholder}
           value={inputValue}
-          onValueChange={setInputValue}
-          onBlur={() => setOpen(false)}
-          onFocus={() => setOpen(true)}
+          onChange={handleChange}
+          onFocus={handleFocus}
+          onClick={handleClick}
+          onBlur={handleBlur}
+          ref={inputRef}
+          className="flex-1 px-3 py-2 border-none outline-none placeholder-gray-400 rounded-lg"
         />
       </div>
 
-      <div className="relative mt-2">
-        {open && (
-          <CommandGroup className="absolute w-full z-30 top-0 overflow-auto border rounded-md shadow-md">
-            {selectables.map((collection) => (
-              <CommandItem
+      {isOpen && filteredCollections.length > 0 && (
+        <div className="absolute w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg z-10">
+          <ul className="max-h-60 overflow-auto p-1">
+            {filteredCollections.map((collection) => (
+              <li
                 key={collection._id}
                 onMouseDown={(e) => e.preventDefault()}
-                onSelect={() => {
-                  onChange(collection._id);
-                  setInputValue("");
-                }}
-                className="hover:bg-grey-2 cursor-pointer"
+                onClick={() => handleSelect(collection._id)}
+                className="cursor-pointer hover:bg-gray-100 px-3 py-2 rounded-lg transition-colors duration-200 ease-in-out"
               >
                 {collection.title}
-              </CommandItem>
+              </li>
             ))}
-          </CommandGroup>
-        )}
-      </div>
-    </Command>
+          </ul>
+        </div>
+      )}
+    </div>
   );
 };
 
