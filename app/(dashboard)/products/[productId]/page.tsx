@@ -4,18 +4,15 @@ import Loader from '@/app/components/custom_ui/Loader'
 import ProductForm from '@/app/components/products/ProductForm'
 import React, { useEffect, useState } from 'react'
 
-const ProductDetails = ({ params }: { params: { productId: string }}) => {
+const CollectionDetails = ({ params }: { params: { productId: string } }) => {
   const [loading, setLoading] = useState(true)
   const [productDetails, setProductDetails] = useState<ProductType | null>(null)
 
-
   const getProductDetails = async () => {
-    try {
-      setLoading(true)
+    try { 
       const res = await fetch(`/api/products/${params.productId}`, {
         method: "GET"
       })
-      console.log(res)
       const data = await res.json()
       setProductDetails(data)
       setLoading(false)
@@ -28,9 +25,11 @@ const ProductDetails = ({ params }: { params: { productId: string }}) => {
     getProductDetails()
   })
 
-  return loading ? <Loader /> : (
-    <ProductForm initialData={productDetails} />
+  return (
+    loading ? <Loader /> : (
+      <ProductForm initialData={productDetails} />
+    )
   )
 }
 
-export default ProductDetails
+export default CollectionDetails
