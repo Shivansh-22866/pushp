@@ -26,7 +26,7 @@ export default async function Home() {
               <CircleDollarSign className="max-sm:hidden" />
             </CardHeader>
             <CardContent>
-              <p className="text-body-bold">$ {totalRevenue.toFixed(2)}</p>
+              <p className="text-body-bold">₹ {totalRevenue.toFixed(2)}</p>
             </CardContent>
         </Card>
 
@@ -36,7 +36,7 @@ export default async function Home() {
               <ShoppingBag className="max-sm:hidden" />
             </CardHeader>
             <CardContent>
-              <p className="text-body-bold"> {totalOrders}</p>
+              <p className="text-body-bold">{totalOrders}</p>
             </CardContent>
         </Card>
 
@@ -52,7 +52,7 @@ export default async function Home() {
       </div>
       <Card className="mt-10">
             <CardHeader className="flex flex-row justify-between items-center">
-              <CardTitle>Sales Chart ()</CardTitle>
+              <CardTitle>Sales Chart (₹)</CardTitle>
               <ChartColumn className="max-sm:hidden" />
             </CardHeader>
             <CardContent>

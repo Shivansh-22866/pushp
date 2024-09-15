@@ -67,7 +67,7 @@ export const GET = async(req: NextRequest, {params} : {params: { collectionId: s
     try {
         await connectToDB()
 
-        const collection = await Collection.findById(params.collectionId)
+        const collection = await Collection.findById(params.collectionId).populate({path: "products", model: Product})
 
         if(!collection) {
             return new NextResponse(JSON.stringify({message: "Collection not found"}), {status: 404})
@@ -80,3 +80,5 @@ export const GET = async(req: NextRequest, {params} : {params: { collectionId: s
         return new NextResponse("Internal Server Error", {status: 500})
     }
 }
+
+export const dynamic = "force-dynamic";

@@ -4,7 +4,7 @@ import { Separator } from '@radix-ui/react-separator'
 import React from 'react'
 
 const Orders = async () => {
-  const res = await fetch("http://localhost:3000//api/orders//")
+  const res = await fetch("http://localhost:3000///api///orders/")
   const orders = await res.json()
 
   console.log(orders)
