@@ -33,4 +33,6 @@ const CollectionDetails = ({params}: {params: {collectionId: string}}) => {
   )
 }
 
+export const dynamic = "force-dynamic"
+
 export default CollectionDetails
